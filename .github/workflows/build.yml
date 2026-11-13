@@ -8,7 +8,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: SDK-Header holen
-        run: git clone --depth 1 https://github.com/liteldev/levilaunchroid sdk
+        run: |
+          git clone --depth 1 https://github.com/liteldev/levilaunchroid sdk
+          echo "--- Header-Suche ---"
+          find sdk -iname "Mod.hpp" -o -iname "ModMenu.hpp"
+          echo "--- Beispiel-Ordner ---"
+          ls -R sdk/examples/full-cpp-mod | head -50
+          echo "--- Build-Dateien ---"
+          find sdk -iname "CMakeLists.txt" -o -iname "xmake.lua" | head -30
+          echo "--- Oberste Ordner ---"
+          ls sdk
       - name: Bauen
         run: |
           H=$(find sdk -path '*/pl/Mod.hpp' | head -n1)
