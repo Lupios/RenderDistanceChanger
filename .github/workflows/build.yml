@@ -7,37 +7,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: SDK-Header holen
-        run: |
-          git clone --depth 1 https://github.com/liteldev/levilaunchroid sdk
-          echo "--- Header-Suche ---"
-          find sdk -iname "Mod.hpp" -o -iname "ModMenu.hpp"
-          echo "--- Beispiel-Ordner ---"
-          ls -R sdk/examples/full-cpp-mod | head -50
-          echo "--- Build-Dateien ---"
-          find sdk -iname "CMakeLists.txt" -o -iname "xmake.lua" | head -30
-          echo "--- Oberste Ordner ---"
-          ls sdk
+      - name: Preloader-Header holen
+        run: git clone --depth 1 https://github.com/LiteLDev/preloader-android preloader
       - name: Bauen
         run: |
-          H=$(find sdk -path '*/pl/Mod.hpp' | head -n1)
-          INC=$(dirname $(dirname "$H"))
-          echo "Header-Ordner: $INC"
+          ls preloader/include/pl
           cmake -S . -B build \
             -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake \
             -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-28 \
-            -DANDROID_ALLOW_UNDEFINED_SYMBOLS=TRUE \
-            -DLEVI_SDK_INCLUDE="$GITHUB_WORKSPACE/$INC"
+            -DPRELOADER_ANDROID_ROOT="$GITHUB_WORKSPACE/preloader"
           cmake --build build -j
       - name: Paket
         run: |
+          find build -name "*.so"
           mkdir out
-          cp build/libRenderDistanceKeys.so manifest.json out/
+          cp $(find build -name "*.so" | head -n1) out/libRenderDistanceKeys.so
+          cp manifest.json out/
           cd out
           zip ../RenderDistanceKeys.levipack *
       - uses: actions/upload-artifact@v4
         with:
           name: RenderDistanceKeys
           path: |
-            build/libRenderDistanceKeys.so
-            RenderDistanceKeys.levipack 
+            out/libRenderDistanceKeys.so
+            RenderDistanceKeys.levipack
