@@ -11,10 +11,13 @@ jobs:
         run: git clone --depth 1 https://github.com/liteldev/levilaunchroid sdk
       - name: Bauen
         run: |
-          INC=$(find sdk -type d -name include | head -n1)
+          H=$(find sdk -path '*/pl/Mod.hpp' | head -n1)
+          INC=$(dirname $(dirname "$H"))
+          echo "Header-Ordner: $INC"
           cmake -S . -B build \
             -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake \
             -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-28 \
+            -DANDROID_ALLOW_UNDEFINED_SYMBOLS=TRUE \
             -DLEVI_SDK_INCLUDE="$GITHUB_WORKSPACE/$INC"
           cmake --build build -j
       - name: Paket
