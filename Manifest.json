@@ -1,6 +1,0 @@
-{
-  "name": "RenderDistanceKeys",
-  "version": "0.1.0",
-  "type": "preload-native",
-  "entry": "libRenderDistanceKeys.so"
-}
