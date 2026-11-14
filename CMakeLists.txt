@@ -13,6 +13,11 @@ if(NOT EXISTS "${PRELOADER_ANDROID_ROOT}/include/pl/ModMenu.hpp")
   message(FATAL_ERROR "Preloader-Header nicht gefunden: ${PRELOADER_ANDROID_ROOT}")
 endif()
 
+if(NOT TARGET preloader)
+  add_subdirectory("${PRELOADER_ANDROID_ROOT}"
+                   "${CMAKE_BINARY_DIR}/_preloader_android")
+endif()
+
 FetchContent_Declare(
   fmt
   GIT_REPOSITORY https://github.com/fmtlib/fmt.git
@@ -30,8 +35,12 @@ target_include_directories(RenderDistanceKeys PRIVATE
 target_compile_options(RenderDistanceKeys PRIVATE
   -Wall -Wextra -fvisibility=hidden -fvisibility-inlines-hidden)
 target_link_libraries(RenderDistanceKeys PRIVATE fmt::fmt)
+if(TARGET preloader)
+  target_link_libraries(RenderDistanceKeys PRIVATE preloader)
+else()
+  target_link_options(RenderDistanceKeys PRIVATE
+    -Wl,--unresolved-symbols=ignore-all)
+endif()
 if(LOG_LIB)
   target_link_libraries(RenderDistanceKeys PRIVATE ${LOG_LIB})
 endif()
-target_link_options(RenderDistanceKeys PRIVATE
-  -Wl,--unresolved-symbols=ignore-all)
